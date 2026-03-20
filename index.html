@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker Project — Anshuman Mohapatra</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080b12;
+    --surface: #0e1420;
+    --surface2: #141b2a;
+    --border: #1e2d45;
+    --accent: #00c2ff;
+    --accent2: #0077ff;
+    --green: #00e5a0;
+    --text: #e8edf5;
+    --muted: #5a6a82;
+    --mid: #8a9bb5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── grid overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,194,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,194,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── glow blobs ── */
+  .blob1, .blob2 {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob1 {
+    width: 500px; height: 500px;
+    background: rgba(0,119,255,0.08);
+    top: -100px; left: -100px;
+  }
+  .blob2 {
+    width: 400px; height: 400px;
+    background: rgba(0,229,160,0.05);
+    bottom: 0; right: -80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2.5rem;
+    background: rgba(8,11,18,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--mid);
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 28px; height: 28px;
+    border: 1.5px solid var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  .gh-link {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 7px 16px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+  }
+  .gh-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 5.5rem 2.5rem 3rem;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(0,194,255,0.25);
+    background: rgba(0,194,255,0.05);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 2rem;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.4rem;
+    color: var(--text);
+  }
+
+  .hero h1 .hi {
+    display: block;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--mid);
+    line-height: 1.75;
+    max-width: 500px;
+    font-weight: 300;
+    margin-bottom: 2.5rem;
+  }
+
+  /* ── META CHIPS ── */
+  .meta-strip {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+    width: fit-content;
+  }
+  .meta-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 22px;
+    border-right: 1px solid var(--border);
+  }
+  .meta-chip:last-child { border-right: none; }
+  .meta-chip-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .meta-chip-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* ── BUTTONS (same structure as friend's) ── */
+  .cta-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 4.5rem;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Outfit', sans-serif;
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-primary {
+    background: var(--accent2);
+    color: #fff;
+    border-color: var(--accent2);
+  }
+  .cta-primary:hover {
+    background: #005fd4;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,119,255,0.3);
+  }
+
+  .cta-accent {
+    background: rgba(0,229,160,0.08);
+    color: var(--green);
+    border-color: rgba(0,229,160,0.25);
+  }
+  .cta-accent:hover {
+    background: rgba(0,229,160,0.14);
+    border-color: var(--green);
+    transform: translateY(-1px);
+  }
+
+  .cta-outline {
+    background: transparent;
+    color: var(--mid);
+    border-color: var(--border);
+  }
+  .cta-outline:hover {
+    border-color: var(--mid);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+
+  /* ── SECTION LABEL ── */
+  .sec-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sec-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── TOC ── */
+  .toc {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    margin-bottom: 3rem;
+  }
+
+  .toc-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    transition: background 0.15s;
+    cursor: default;
+  }
+  .toc-row:last-child { border-bottom: none; }
+  .toc-row:hover {
+    background: var(--surface2);
+  }
+  .toc-row:hover .toc-n { color: var(--accent); }
+
+  .toc-n {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    min-width: 22px;
+    transition: color 0.15s;
+  }
+  .toc-name {
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+  }
+  .toc-desc {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── STEPS ── */
+  .steps {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    margin-bottom: 3rem;
+  }
+
+  .step-row {
+    display: flex;
+    gap: 1.25rem;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+    transition: background 0.15s;
+  }
+  .step-row:last-child { border-bottom: none; }
+  .step-row:hover { background: var(--surface2); }
+
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    padding-top: 2px;
+    min-width: 20px;
+  }
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 5px;
+  }
+  .step-body {
+    font-size: 12.5px;
+    color: var(--mid);
+    line-height: 1.65;
+  }
+  .step-body code {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    background: rgba(0,194,255,0.08);
+    border: 1px solid rgba(0,194,255,0.15);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent);
+  }
+
+  /* ── STACK PILLS ── */
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 3rem;
+  }
+  .pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    background: var(--surface);
+    transition: all 0.15s;
+  }
+  .pill:hover {
+    color: var(--accent);
+    border-color: rgba(0,194,255,0.3);
+    background: rgba(0,194,255,0.05);
+  }
+
+  /* ── MAIN ── */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2.5rem 5rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: rgba(8,11,18,0.9);
+  }
+  .footer-left {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .footer-left strong { color: var(--text); font-weight: 500; }
+  .footer-right {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 3.5rem 1.25rem 2rem; }
+    main { padding: 0 1.25rem 3rem; }
+    header { padding: 1rem 1.25rem; }
+    .meta-strip { width: 100%; }
+    .toc-desc { display: none; }
+    footer { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob1"></div>
+<div class="blob2"></div>
+
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">🐳</div>
+    anshuman / docker-project
+  </a>
+  <a class="gh-link" href="#" target="_blank">github ↗</a>
+</header>
+
+<div class="hero">
+  <div class="hero-tag">Project Report · March 2026</div>
+
+  <h1>
+    Containerized Web App
+    <span class="hi">with PostgreSQL</span>
+  </h1>
+
+  <p class="hero-desc">
+    Multi-stage Docker builds, Macvlan networking, persistent volumes,
+    and Docker Compose orchestration — deployed on Flask + PostgreSQL 15.
+  </p>
+
+  <div class="meta-strip">
+    <div class="meta-chip">
+      <span class="meta-chip-label">Name</span>
+      <span class="meta-chip-val">Anshuman Mohapatra</span>
+    </div>
+    <div class="meta-chip">
+      <span class="meta-chip-label">SAP ID</span>
+      <span class="meta-chip-val">500119016</span>
+    </div>
+    <div class="meta-chip">
+      <span class="meta-chip-label">Roll No.</span>
+      <span class="meta-chip-val">R2142230609</span>
+    </div>
+    <div class="meta-chip">
+      <span class="meta-chip-label">Date</span>
+      <span class="meta-chip-val">March 2026</span>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <a class="cta-btn cta-primary" href="#" target="_blank">
+      🐙 GitHub Repo
+    </a>
+    <a class="cta-btn cta-accent" href="#" target="_blank">
+      📄 PDF Report
+    </a>
+    <a class="cta-btn cta-outline" href="#" target="_blank">
+      📝 Markdown
+    </a>
+    <a class="cta-btn cta-outline" href="#" target="_blank">
+      🖼 Screenshots
+    </a>
+  </div>
+</div>
+
+<main>
+
+  <div class="sec-label">Contents</div>
+  <div class="toc">
+    <div class="toc-row"><span class="toc-n">01</span><span class="toc-name">Introduction</span><span class="toc-desc">overview & goals</span></div>
+    <div class="toc-row"><span class="toc-n">02</span><span class="toc-name">System Architecture</span><span class="toc-desc">Flask + PostgreSQL with Compose</span></div>
+    <div class="toc-row"><span class="toc-n">03</span><span class="toc-name">Multi-Stage Build</span><span class="toc-desc">~850 MB → ~120 MB</span></div>
+    <div class="toc-row"><span class="toc-n">04</span><span class="toc-name">Network Configuration</span><span class="toc-desc">Macvlan L2 networking</span></div>
+    <div class="toc-row"><span class="toc-n">05</span><span class="toc-name">Image Optimization</span><span class="toc-desc">before & after metrics</span></div>
+    <div class="toc-row"><span class="toc-n">06</span><span class="toc-name">Macvlan vs IPvlan</span><span class="toc-desc">side-by-side analysis</span></div>
+    <div class="toc-row"><span class="toc-n">07</span><span class="toc-name">Volume Persistence</span><span class="toc-desc">data surviving restarts</span></div>
+    <div class="toc-row"><span class="toc-n">08</span><span class="toc-name">Conclusion</span><span class="toc-desc">key outcomes</span></div>
+  </div>
+
+  <div class="sec-label">Run It Locally</div>
+  <div class="steps">
+    <div class="step-row">
+      <span class="step-num">01</span>
+      <div>
+        <div class="step-title">Open the PDF Report</div>
+        <div class="step-body">Click <strong>PDF Report</strong> above — opens in your browser. Save with <code>Ctrl+S</code> / <code>Cmd+S</code>.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">02</span>
+      <div>
+        <div class="step-title">Read the Markdown Report</div>
+        <div class="step-body">Click <strong>Markdown</strong> — <code>REPORT.md</code> renders formatted on GitHub with no download needed.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">03</span>
+      <div>
+        <div class="step-title">Browse Source Code</div>
+        <div class="step-body">Click <strong>GitHub Repo</strong> to explore Dockerfiles, Compose config, Flask backend, and screenshots.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">04</span>
+      <div>
+        <div class="step-title">Run Locally</div>
+        <div class="step-body">Clone the repo and run <code>docker compose up --build</code> — app available at <code>localhost:5000</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Stack</div>
+  <div class="pills">
+    <span class="pill">Docker</span>
+    <span class="pill">Docker Compose</span>
+    <span class="pill">PostgreSQL 15</span>
+    <span class="pill">Python 3.11</span>
+    <span class="pill">Flask</span>
+    <span class="pill">Multi-Stage Build</span>
+    <span class="pill">Macvlan</span>
+    <span class="pill">IPvlan</span>
+    <span class="pill">Volume Persistence</span>
+    <span class="pill">REST API</span>
+    <span class="pill">Alpine Linux</span>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-left">
+    <strong>Anshuman Mohapatra</strong> · SAP 500119016 · Roll R2142230609
+  </div>
+  <div class="footer-right">Containerization & Orchestration · March 2026</div>
+</footer>
+
+</body>
+</html>
